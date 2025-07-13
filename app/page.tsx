@@ -105,20 +105,14 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex-shrink-0 bg-white rounded-xl shadow-lg overflow-hidden"
-                style={{ width: '300px', height: '600px' }}
+                className="flex-shrink-0"
+                style={{ width: '300px' }}
               >
-                <div className="h-full flex flex-col">
-                  <div className="bg-lighter-accent text-white px-4 py-2 text-sm font-medium">
+                {/* Separated Title with Button */}
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-medium text-gray-700">
                     Screen {index + 1}: {screenTitles[index]}
-                  </div>
-                  <div className="flex-1 relative overflow-hidden">
-                    <div className="absolute inset-0 transform scale-75 origin-top-left">
-                      <div style={{ width: '400px', height: '800px' }} className="px-6 py-8">
-                        {screen}
-                      </div>
-                    </div>
-                  </div>
+                  </h3>
                   <button
                     onClick={() => {
                       setDesignMode('app')
@@ -127,10 +121,31 @@ export default function Home() {
                         goToScreen(index)
                       }
                     }}
-                    className="bg-gray-50 text-gray-600 px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                    className="px-2 py-1 text-xs bg-black text-white rounded hover:bg-gray-800 transition-colors"
                   >
-                    View in App
+                    View
                   </button>
+                </div>
+                
+                {/* Screen Preview */}
+                <div 
+                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
+                  style={{ height: '600px' }}
+                  onClick={() => {
+                    setDesignMode('app')
+                    if (!showMainApp) {
+                      setCurrentScreen(index)
+                      goToScreen(index)
+                    }
+                  }}
+                >
+                  <div className="h-full relative overflow-hidden">
+                    <div className="absolute inset-0 transform scale-75 origin-top-left">
+                      <div style={{ width: '400px', height: '800px' }} className="px-6 py-8">
+                        {screen}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             ))}

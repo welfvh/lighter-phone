@@ -8,14 +8,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'lighter-bg': '#FAFAF8',
-        'lighter-text': '#2D2D2D',
-        'lighter-accent': '#4A5568',
-        'lighter-soft': '#E8E8E4',
-        'lighter-success': '#48BB78',
+        'lighter-bg': '#FFFFFF',
+        'lighter-text': '#000000',
+        'lighter-accent': '#2D2D2D',
+        'lighter-soft': '#F5F5F5',
+        'lighter-success': '#10B981',
       },
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
+        'sans': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'system-ui', 'sans-serif'],
       },
     },
   },
