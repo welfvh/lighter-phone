@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import ControlBar from '@/components/ControlBar'
 import OnboardingScreen1 from '@/components/onboarding/Screen1-Welcome'
 import OnboardingScreen2 from '@/components/onboarding/Screen2-WhyGoLighter'
 import OnboardingScreen3 from '@/components/onboarding/Screen3-WhatDoYouWant'
@@ -15,6 +16,7 @@ import MainScreen from '@/components/MainScreen'
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState(0)
   const [showMainApp, setShowMainApp] = useState(false)
+  const [designMode, setDesignMode] = useState<'app' | 'design'>('app')
   const [userData, setUserData] = useState({
     goals: [],
     lightnessLevel: '',
@@ -74,14 +76,87 @@ export default function Home() {
     }
   }, [])
 
+  const allScreens = showMainApp 
+    ? [...screens, <MainScreen key="main" userData={userData} />]
+    : screens
+
+  const screenTitles = [
+    'Welcome',
+    'Why Go Lighter',
+    'Your Goals',
+    'Key Decisions', 
+    'Lightness Levels',
+    'Before & After',
+    'Go Together',
+    'Get Started',
+    ...(showMainApp ? ['Main App'] : [])
+  ]
+
+  if (designMode === 'design') {
+    return (
+      <div className="min-h-screen bg-gray-100 relative">
+        <ControlBar mode={designMode} onModeChange={setDesignMode} />
+        
+        <div className="pt-20 pb-8">
+          <div className="flex overflow-x-auto hide-scrollbar space-x-6 px-6">
+            {allScreens.map((screen, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex-shrink-0 bg-white rounded-xl shadow-lg overflow-hidden"
+                style={{ width: '300px', height: '600px' }}
+              >
+                <div className="h-full flex flex-col">
+                  <div className="bg-lighter-accent text-white px-4 py-2 text-sm font-medium">
+                    Screen {index + 1}: {screenTitles[index]}
+                  </div>
+                  <div className="flex-1 relative overflow-hidden">
+                    <div className="absolute inset-0 transform scale-75 origin-top-left">
+                      <div style={{ width: '400px', height: '800px' }} className="px-6 py-8">
+                        {screen}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setDesignMode('app')
+                      if (!showMainApp) {
+                        setCurrentScreen(index)
+                        goToScreen(index)
+                      }
+                    }}
+                    className="bg-gray-50 text-gray-600 px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                  >
+                    View in App
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (showMainApp) {
-    return <MainScreen userData={userData} />
+    return (
+      <div className="relative">
+        <ControlBar mode={designMode} onModeChange={setDesignMode} />
+        <div className="pt-16">
+          <MainScreen userData={userData} />
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="h-screen w-screen overflow-hidden relative">
+      <ControlBar mode={designMode} onModeChange={setDesignMode} />
+      
       {/* Progress dots */}
-      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+      <div className="absolute top-20 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
         {screens.map((_, index) => (
           <button
             key={index}
@@ -96,7 +171,7 @@ export default function Home() {
       {/* Horizontal scrolling container */}
       <div
         ref={scrollRef}
-        className="h-full w-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar"
+        className="h-full w-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar pt-16"
       >
         {screens.map((screen, index) => (
           <div

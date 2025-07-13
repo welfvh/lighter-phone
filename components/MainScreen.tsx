@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { CheckCircle, Circle, ChevronRight, Settings, Smartphone, Bell, Palette, Home, Shield, Focus } from 'lucide-react'
+import { CheckCircle, Settings, Smartphone, Bell, Palette, Home, Focus } from 'lucide-react'
+import BottomModal, { InstructionStep } from './BottomModal'
+import { instructions } from '@/data/instructions'
 
 interface Props {
   userData: {
@@ -66,6 +68,7 @@ const sections = [
 
 export default function MainScreen({ userData }: Props) {
   const [completedTasks, setCompletedTasks] = useState<string[]>([])
+  const [selectedIntervention, setSelectedIntervention] = useState<string | null>(null)
   
   const getLightnessLevelName = (level: string) => {
     const levels: Record<string, string> = {
@@ -83,6 +86,19 @@ export default function MainScreen({ userData }: Props) {
         ? prev.filter(id => id !== taskId)
         : [...prev, taskId]
     )
+  }
+
+  const openInstructions = (taskId: string) => {
+    setSelectedIntervention(taskId)
+  }
+
+  const closeInstructions = () => {
+    setSelectedIntervention(null)
+  }
+
+  const handleStepComplete = (taskId: string) => {
+    setCompletedTasks(prev => [...prev, taskId])
+    closeInstructions()
   }
 
   const totalTasks = sections.reduce((acc, section) => acc + section.items.length, 0)
@@ -163,19 +179,18 @@ export default function MainScreen({ userData }: Props) {
               
               <div className="divide-y divide-gray-100">
                 {section.items.map((item, itemIndex) => (
-                  <motion.button
+                  <motion.div
                     key={item.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 * itemIndex }}
-                    onClick={() => toggleTask(item.id)}
-                    className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    className="p-4 flex items-center justify-between"
                   >
                     <div className="flex items-center space-x-3 flex-1">
                       {completedTasks.includes(item.id) ? (
                         <CheckCircle className="w-5 h-5 text-lighter-success flex-shrink-0" />
                       ) : (
-                        <Circle className="w-5 h-5 text-gray-300 flex-shrink-0" />
+                        <div className="w-5 h-5 border-2 border-gray-300 rounded flex-shrink-0" />
                       )}
                       <div className="text-left flex-1">
                         <div className={`font-medium ${
@@ -188,16 +203,122 @@ export default function MainScreen({ userData }: Props) {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => openInstructions(item.id)}
+                        className="px-3 py-1.5 text-sm font-medium text-lighter-accent border border-lighter-accent rounded-full hover:bg-lighter-accent hover:text-white transition-colors"
+                      >
+                        How to
+                      </button>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={completedTasks.includes(item.id)}
+                          onChange={() => toggleTask(item.id)}
+                        />
+                        <div className={`w-11 h-6 rounded-full transition-colors ${
+                          completedTasks.includes(item.id) ? 'bg-lighter-success' : 'bg-gray-200'
+                        }`}>
+                          <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
+                            completedTasks.includes(item.id) ? 'translate-x-5' : 'translate-x-0.5'
+                          } mt-0.5`} />
+                        </div>
+                      </label>
                     </div>
-                  </motion.button>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
           ))}
         </div>
       </div>
+
+      {/* Bottom Modal for Instructions */}
+      {selectedIntervention && instructions[selectedIntervention] && (
+        <BottomModal
+          isOpen={!!selectedIntervention}
+          onClose={closeInstructions}
+          title={instructions[selectedIntervention].title}
+          description={instructions[selectedIntervention].description}
+        >
+          <div className="space-y-4">
+            {/* Difficulty and time info */}
+            <div className="flex items-center space-x-4 text-sm">
+              <div className="flex items-center space-x-2">
+                <span className="text-gray-500">Difficulty:</span>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  instructions[selectedIntervention].difficulty === 'easy' 
+                    ? 'bg-green-100 text-green-700'
+                    : instructions[selectedIntervention].difficulty === 'medium'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {instructions[selectedIntervention].difficulty}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-gray-500">Time:</span>
+                <span className="font-medium">{instructions[selectedIntervention].timeRequired}</span>
+              </div>
+            </div>
+
+            {/* Steps */}
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900">Steps:</h4>
+              {instructions[selectedIntervention].steps.map((step) => (
+                <InstructionStep
+                  key={step.step}
+                  step={step.step}
+                  title={step.title}
+                  description={step.description}
+                  screenshot={step.screenshot}
+                  deepLink={step.deepLink}
+                  onComplete={() => handleStepComplete(selectedIntervention)}
+                />
+              ))}
+            </div>
+
+            {/* Benefits */}
+            {instructions[selectedIntervention].benefits.length > 0 && (
+              <div className="bg-green-50 rounded-lg p-4">
+                <h4 className="font-medium text-green-900 mb-2">Benefits:</h4>
+                <ul className="text-sm text-green-700 space-y-1">
+                  {instructions[selectedIntervention].benefits.map((benefit, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="text-green-500 mr-2">•</span>
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Tips */}
+            {instructions[selectedIntervention].tips && instructions[selectedIntervention].tips!.length > 0 && (
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h4 className="font-medium text-blue-900 mb-2">Pro Tips:</h4>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  {instructions[selectedIntervention].tips!.map((tip, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="text-blue-500 mr-2">💡</span>
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Complete button */}
+            <button
+              onClick={() => handleStepComplete(selectedIntervention)}
+              className="w-full bg-lighter-success text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors"
+            >
+              Mark as Complete
+            </button>
+          </div>
+        </BottomModal>
+      )}
     </div>
   )
 }
