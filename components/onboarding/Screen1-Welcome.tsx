@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import { Heart } from 'lucide-react'
 
 interface Props {
   onNext: () => void
@@ -12,9 +11,6 @@ export default function Screen1Welcome({ onNext }: Props) {
       animate={{ opacity: 1, y: 0 }}
       className="text-center space-y-8"
     >
-      <div className="mb-12">
-        <Heart className="w-16 h-16 mx-auto text-lighter-accent mb-6" />
-      </div>
       
       <h1 className="text-2xl font-medium leading-relaxed">
         Hi friend!

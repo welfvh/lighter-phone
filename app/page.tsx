@@ -12,11 +12,13 @@ import OnboardingScreen6 from '@/components/onboarding/Screen6-BeforeAfter'
 import OnboardingScreen7 from '@/components/onboarding/Screen7-GoLighterTogether'
 import OnboardingScreen8 from '@/components/onboarding/Screen8-GetStarted'
 import MainScreen from '@/components/MainScreen'
+import { HomeScreenMinimal, HomeScreenProgress, HomeScreenDashboard } from '@/components/wip/HomeScreenVariations'
 
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState(0)
   const [showMainApp, setShowMainApp] = useState(false)
   const [designMode, setDesignMode] = useState<'app' | 'design'>('app')
+  const [designView, setDesignView] = useState<'onboarding' | 'wip'>('onboarding')
   const [userData, setUserData] = useState({
     goals: [],
     lightnessLevel: '',
@@ -76,11 +78,11 @@ export default function Home() {
     }
   }, [])
 
-  const allScreens = showMainApp 
+  const onboardingScreens = showMainApp 
     ? [...screens, <MainScreen key="main" userData={userData} />]
     : screens
 
-  const screenTitles = [
+  const onboardingTitles = [
     'Welcome',
     'Why Go Lighter',
     'Your Goals',
@@ -92,14 +94,57 @@ export default function Home() {
     ...(showMainApp ? ['Main App'] : [])
   ]
 
+  const wipScreens = [
+    <HomeScreenMinimal key="minimal" />,
+    <HomeScreenProgress key="progress" />,
+    <HomeScreenDashboard key="dashboard" />,
+  ]
+
+  const wipTitles = [
+    'Home: Minimal',
+    'Home: Progress',
+    'Home: Dashboard',
+  ]
+
+  const currentScreens = designView === 'onboarding' ? onboardingScreens : wipScreens
+  const currentTitles = designView === 'onboarding' ? onboardingTitles : wipTitles
+
   if (designMode === 'design') {
     return (
       <div className="min-h-screen bg-gray-100 relative">
         <ControlBar mode={designMode} onModeChange={setDesignMode} />
         
-        <div className="pt-20 pb-8">
+        {/* Design View Selector */}
+        <div className="pt-20 pb-4">
+          <div className="flex justify-center">
+            <div className="bg-white rounded-full p-1 shadow-sm">
+              <button
+                onClick={() => setDesignView('onboarding')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  designView === 'onboarding'
+                    ? 'bg-black text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Onboarding
+              </button>
+              <button
+                onClick={() => setDesignView('wip')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  designView === 'wip'
+                    ? 'bg-black text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Work in Progress
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="pb-8">
           <div className="flex overflow-x-auto hide-scrollbar space-x-6 px-6">
-            {allScreens.map((screen, index) => (
+            {currentScreens.map((screen, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -111,38 +156,46 @@ export default function Home() {
                 {/* Separated Title with Button */}
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-medium text-gray-700">
-                    Screen {index + 1}: {screenTitles[index]}
+                    {designView === 'onboarding' ? `Screen ${index + 1}: ` : ''}{currentTitles[index]}
                   </h3>
                   <button
                     onClick={() => {
                       setDesignMode('app')
-                      if (!showMainApp) {
+                      if (designView === 'onboarding' && !showMainApp) {
                         setCurrentScreen(index)
                         goToScreen(index)
                       }
                     }}
                     className="px-2 py-1 text-xs bg-black text-white rounded hover:bg-gray-800 transition-colors"
                   >
-                    View
+                    {designView === 'wip' ? 'Preview' : 'View'}
                   </button>
                 </div>
                 
                 {/* Screen Preview */}
                 <div 
-                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
-                  style={{ height: '600px' }}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow relative"
+                  style={{ height: '600px', aspectRatio: '375/812' }}
                   onClick={() => {
                     setDesignMode('app')
-                    if (!showMainApp) {
+                    if (designView === 'onboarding' && !showMainApp) {
                       setCurrentScreen(index)
                       goToScreen(index)
                     }
                   }}
                 >
-                  <div className="h-full relative overflow-hidden">
-                    <div className="absolute inset-0 transform scale-75 origin-top-left">
-                      <div style={{ width: '400px', height: '800px' }} className="px-6 py-8">
-                        {screen}
+                  {/* iOS-like status bar */}
+                  <div className="absolute top-0 left-0 right-0 h-6 bg-black rounded-t-xl flex items-center justify-center">
+                    <div className="w-16 h-1 bg-white rounded-full opacity-50"></div>
+                  </div>
+                  
+                  {/* Screen content with proper iOS spacing */}
+                  <div className="h-full flex items-center justify-center overflow-hidden pt-6">
+                    <div className="transform scale-75">
+                      <div style={{ width: '320px', height: '600px' }} className="flex items-center justify-center">
+                        <div className="w-full max-w-md px-6">
+                          {screen}
+                        </div>
                       </div>
                     </div>
                   </div>
