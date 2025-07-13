@@ -155,7 +155,7 @@ export default function Home() {
                     }
                   }}
                 >
-                  <div className="h-full overflow-y-auto">
+                  <div className="h-full overflow-y-auto overflow-x-hidden">
                     <div className="transform scale-75 origin-top">
                       <div style={{ width: '400px' }} className="min-h-screen flex items-center justify-center py-16">
                         <div className="w-full max-w-md px-6">
