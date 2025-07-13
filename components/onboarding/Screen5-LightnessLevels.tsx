@@ -98,14 +98,6 @@ export default function Screen5LightnessLevels({ onNext }: Props) {
         </p>
       </motion.div>
 
-      <div className="text-center mt-6">
-        <p className="text-xs text-gray-500">
-          Actually want to get a Light Phone & Daylight Computer?
-        </p>
-        <a href="#" className="text-xs text-lighter-accent underline">
-          Learn more
-        </a>
-      </div>
       
       <motion.button
         whileHover={{ scale: 1.05 }}
