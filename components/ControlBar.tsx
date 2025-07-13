@@ -6,9 +6,11 @@ import { Eye, Smartphone } from 'lucide-react'
 interface ControlBarProps {
   mode: 'app' | 'design'
   onModeChange: (mode: 'app' | 'design') => void
+  designView?: 'onboarding' | 'wip'
+  onDesignViewChange?: (view: 'onboarding' | 'wip') => void
 }
 
-export default function ControlBar({ mode, onModeChange }: ControlBarProps) {
+export default function ControlBar({ mode, onModeChange, designView, onDesignViewChange }: ControlBarProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -40,6 +42,33 @@ export default function ControlBar({ mode, onModeChange }: ControlBarProps) {
             <Eye className="w-4 h-4" />
             <span>Design</span>
           </button>
+
+          {/* Design View Selector - only show when in design mode */}
+          {mode === 'design' && designView && onDesignViewChange && (
+            <>
+              <div className="w-px h-6 bg-gray-300 mx-2" />
+              <button
+                onClick={() => onDesignViewChange('onboarding')}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  designView === 'onboarding'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Onboarding
+              </button>
+              <button
+                onClick={() => onDesignViewChange('wip')}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  designView === 'wip'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                WIP
+              </button>
+            </>
+          )}
         </div>
       </div>
     </motion.div>

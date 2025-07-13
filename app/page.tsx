@@ -9,8 +9,7 @@ import OnboardingScreen3 from '@/components/onboarding/Screen3-WhatDoYouWant'
 import OnboardingScreen4 from '@/components/onboarding/Screen4-KeyDecisions'
 import OnboardingScreen5 from '@/components/onboarding/Screen5-LightnessLevels'
 import OnboardingScreen6 from '@/components/onboarding/Screen6-BeforeAfter'
-import OnboardingScreen7 from '@/components/onboarding/Screen7-GoLighterTogether'
-import OnboardingScreen8 from '@/components/onboarding/Screen8-GetStarted'
+import OnboardingScreen7 from '@/components/onboarding/Screen8-GetStarted'
 import MainScreen from '@/components/MainScreen'
 import { HomeScreenMinimal, HomeScreenProgress, HomeScreenDashboard } from '@/components/wip/HomeScreenVariations'
 
@@ -43,11 +42,7 @@ export default function Home() {
       goToScreen(5)
     }} />,
     <OnboardingScreen6 key="6" onNext={() => goToScreen(6)} />,
-    <OnboardingScreen7 key="7" onNext={(email) => {
-      setUserData({...userData, email})
-      goToScreen(7)
-    }} />,
-    <OnboardingScreen8 key="8" onNext={() => setShowMainApp(true)} userData={userData} />,
+    <OnboardingScreen7 key="7" onNext={() => setShowMainApp(true)} userData={userData} />,
   ]
 
   const goToScreen = (index: number) => {
@@ -89,7 +84,6 @@ export default function Home() {
     'Key Decisions', 
     'Lightness Levels',
     'Before & After',
-    'Go Together',
     'Get Started',
     ...(showMainApp ? ['Main App'] : [])
   ]
@@ -112,37 +106,14 @@ export default function Home() {
   if (designMode === 'design') {
     return (
       <div className="min-h-screen bg-gray-100 relative">
-        <ControlBar mode={designMode} onModeChange={setDesignMode} />
+        <ControlBar 
+          mode={designMode} 
+          onModeChange={setDesignMode}
+          designView={designView}
+          onDesignViewChange={setDesignView}
+        />
         
-        {/* Design View Selector */}
-        <div className="pt-20 pb-4">
-          <div className="flex justify-center">
-            <div className="bg-white rounded-full p-1 shadow-sm">
-              <button
-                onClick={() => setDesignView('onboarding')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  designView === 'onboarding'
-                    ? 'bg-black text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Onboarding
-              </button>
-              <button
-                onClick={() => setDesignView('wip')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  designView === 'wip'
-                    ? 'bg-black text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Work in Progress
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="pb-8">
+        <div className="pt-20 pb-8">
           <div className="flex overflow-x-auto hide-scrollbar space-x-6 px-6">
             {currentScreens.map((screen, index) => (
               <motion.div
@@ -174,8 +145,8 @@ export default function Home() {
                 
                 {/* Screen Preview */}
                 <div 
-                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow relative"
-                  style={{ height: '600px', aspectRatio: '375/812' }}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
+                  style={{ width: '300px', height: '600px' }}
                   onClick={() => {
                     setDesignMode('app')
                     if (designView === 'onboarding' && !showMainApp) {
@@ -184,15 +155,9 @@ export default function Home() {
                     }
                   }}
                 >
-                  {/* iOS-like status bar */}
-                  <div className="absolute top-0 left-0 right-0 h-6 bg-black rounded-t-xl flex items-center justify-center">
-                    <div className="w-16 h-1 bg-white rounded-full opacity-50"></div>
-                  </div>
-                  
-                  {/* Screen content with proper iOS spacing */}
-                  <div className="h-full flex items-center justify-center overflow-hidden pt-6">
-                    <div className="transform scale-75">
-                      <div style={{ width: '320px', height: '600px' }} className="flex items-center justify-center">
+                  <div className="h-full overflow-y-auto">
+                    <div className="transform scale-75 origin-top">
+                      <div style={{ width: '400px' }} className="min-h-screen flex items-center justify-center py-16">
                         <div className="w-full max-w-md px-6">
                           {screen}
                         </div>
